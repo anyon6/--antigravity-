@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CPBL Live Tracker</title>
+  <link rel="stylesheet" href="popup_v3.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header Section -->
+    <header class="header">
+      <div class="logo-area">
+        <span class="pulse-dot"></span>
+        <h1 class="title">CPBL Live <span style="font-size: 10px; opacity: 0.6; font-weight: normal; vertical-align: super; margin-left: 4px;">v1.9.8</span></h1>
+      </div>
+      <div class="selector-area">
+        <select id="game-selector" class="game-select">
+          <option value="">正在載入賽事...</option>
+        </select>
+      </div>
+    </header>
+
+    <!-- Date Navigation Bar -->
+    <div class="date-nav-bar" style="position: relative;">
+      <button id="prev-date-btn" class="nav-btn" title="前一天">◀</button>
+      <div class="date-display-wrapper" id="date-display-btn" title="選擇日期/月份">
+        <span id="current-date-display" class="date-display">載入中...</span>
+        <span class="calendar-icon">📅</span>
+      </div>
+      <input type="date" id="date-picker-input" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;">
+      <button id="next-date-btn" class="nav-btn" title="後一天">▶</button>
+    </div>
+
+    <!-- Scoreboard Card -->
+    <section class="card scoreboard-card" id="scoreboard-card">
+      <div class="scoreboard-container">
+        <!-- Away Team -->
+        <div class="team-block away-team">
+          <div class="team-logo-container">
+            <img class="team-logo-img" id="away-logo-img" src="" alt="客隊" style="display: none;">
+            <div class="team-logo-placeholder" id="away-logo-abbr">客</div>
+          </div>
+          <h2 class="team-name" id="away-name">載入中</h2>
+          <div class="starting-pitcher" id="away-pitcher-sub">先發: 載入中</div>
+        </div>
+        
+        <!-- Score & Status -->
+        <div class="score-block">
+          <div class="scores">
+            <span class="score-val" id="away-score">-</span>
+            <span class="score-divider">:</span>
+            <span class="score-val" id="home-score">-</span>
+          </div>
+          <div class="game-status-badge" id="game-inning">已下檔</div>
+        </div>
+
+        <!-- Home Team -->
+        <div class="team-block home-team">
+          <div class="team-logo-container">
+            <img class="team-logo-img" id="home-logo-img" src="" alt="主隊" style="display: none;">
+            <div class="team-logo-placeholder" id="home-logo-abbr">主</div>
+          </div>
+          <h2 class="team-name" id="home-name">載入中</h2>
+          <div class="starting-pitcher" id="home-pitcher-sub">先發: 載入中</div>
+        </div>
+      </div>
+      
+      <!-- Live Game Info Detail (Stadium, Game Number, Game Time) -->
+      <div class="game-meta-info">
+        <span id="game-stadium">國立體育大學</span>
+        <span class="meta-dot">•</span>
+        <span id="game-number">場次 --</span>
+        <span class="meta-dot">•</span>
+        <span id="game-time">開賽 --:--</span>
+      </div>
+    </section>
+
+    <!-- No Games Placeholder -->
+    <div id="no-games-card" class="card" style="display: none; text-align: center; padding: 40px 20px;">
+      <div style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">本日無比賽 (休兵日)</div>
+    </div>
+
+    <!-- Matchup Card (Combined Live Play details) -->
+    <section class="card matchup-card" id="matchup-section">
+      <h3 class="card-title" id="matchup-title">投打對決 - 局</h3>
+      <div class="matchup-container">
+        <!-- Left Column: Pitcher -->
+        <div class="matchup-side pitcher-side">
+          <div class="role-tag">PITCHER</div>
+          <div class="player-name" id="pitcher-name">--</div>
+          <div class="player-stats" id="pitch-count">ERA --</div>
+        </div>
+        
+        <!-- Center Column: Live Status (SBO & Diamond) -->
+        <div class="matchup-center" id="live-status-middle">
+          <!-- SBO Panel (Horizontal scoreboard strip) -->
+          <div class="sbo-panel-horizontal">
+            <div class="sbo-row-h">
+              <span class="sbo-label-h">S</span>
+              <div class="sbo-dots" id="strike-dots">
+                <span class="dot strike-dot"></span>
+                <span class="dot strike-dot"></span>
+                <span class="dot strike-dot"></span>
+              </div>
+              <span class="sbo-status-text" id="strike-status"></span>
+            </div>
+            <div class="sbo-row-h">
+              <span class="sbo-label-h">B</span>
+              <div class="sbo-dots" id="ball-dots">
+                <span class="dot ball-dot"></span>
+                <span class="dot ball-dot"></span>
+                <span class="dot ball-dot"></span>
+                <span class="dot ball-dot"></span>
+              </div>
+              <span class="sbo-status-text" id="ball-status"></span>
+            </div>
+            <div class="sbo-row-h">
+              <span class="sbo-label-h">O</span>
+              <div class="sbo-dots" id="out-dots">
+                <span class="dot out-dot"></span>
+                <span class="dot out-dot"></span>
+                <span class="dot out-dot"></span>
+              </div>
+              <span class="sbo-status-text" id="out-status"></span>
+            </div>
+          </div>
+          
+          <!-- Diamond Container -->
+          <div class="diamond-container">
+            <div class="field-diamond">
+              <div class="base base-2nd" id="base-2nd" title="二壘"></div>
+              <div class="base base-3rd" id="base-3rd" title="三壘"></div>
+              <div class="base base-1st" id="base-1st" title="一壘"></div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Right Column: Batter -->
+        <div class="matchup-side batter-side">
+          <div class="role-tag">BATTER</div>
+          <div class="player-name" id="batter-name">--</div>
+          <div class="player-stats" id="batter-desc">第--棒</div>
+        </div>
+      </div>
+      <div class="runners-panel" id="runners-panel" style="display: none;"></div>
+    </section>
+
+    <!-- Latest Play Ticker Section -->
+    <section class="card play-ticker-card" id="ticker-section" style="display: none;">
+      <div class="ticker-header">
+        <span class="ticker-dot"></span>
+        <span class="ticker-title" id="ticker-title">得分資訊</span>
+      </div>
+      <div class="ticker-body" id="latest-play-text">
+        等待賽事進行...
+      </div>
+    </section>
+
+    <!-- Live Score Toast Notification -->
+    <div id="score-toast" class="score-toast">
+      <div class="toast-content">
+        <div class="toast-logo-container">
+          <img id="toast-team-logo" src="" alt="隊徽">
+        </div>
+        <div class="toast-text-area">
+          <div class="toast-title" id="toast-title">得分通知</div>
+          <div class="toast-desc" id="toast-desc">內容</div>
+        </div>
+        <button id="toast-close-btn" class="toast-close">&times;</button>
+      </div>
+    </div>
+
+    <!-- Footer Status / Reload -->
+    <footer class="footer-status">
+      <span class="sync-status" id="sync-status">資料即時同步中</span>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <span class="reload-btn" id="reload-btn">手動重新整理</span>
+      </div>
+    </footer>
+  </div>
+
+  <script src="popup_v3.js"></script>
+</body>
+</html>
